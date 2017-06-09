@@ -470,6 +470,7 @@ func (f *Fs) newObjectWithInfo(remote string, info *drive.File) (fs.Object, erro
 	}
 	if info != nil {
 		o.setMetaData(info)
+		info.Title = strings.Replace(info.Title, '／', '/', -1)
 	} else {
 		err := o.readMetaData() // reads info and meta, returning an error
 		if err != nil {
@@ -558,7 +559,8 @@ func (f *Fs) findExportFormat(filepath string, item *drive.File) (extension, lin
 func (f *Fs) ListDir(out fs.ListOpts, job dircache.ListDirJob) (jobs []dircache.ListDirJob, err error) {
 	fs.Debugf(f, "Reading %q", job.Path)
 	_, err = f.listAll(job.DirID, "", false, false, false, func(item *drive.File) bool {
-		remote := job.Path + item.Title
+		item.Title = strings.Replace(item.Title, '/', '／', -1)
+                remote := job.Path + item.Title
 		switch {
 		case *driveAuthOwnerOnly && !isAuthOwned(item):
 			// ignore object or directory
@@ -651,6 +653,7 @@ func (f *Fs) createFileInfo(remote string, modTime time.Time, size int64) (*Obje
 		MimeType:     fs.MimeTypeFromName(remote),
 		ModifiedDate: modTime.Format(timeFormatOut),
 	}
+	createInfo.Title = strings.Replace(createInfo.Title, '／', '/', -1)
 	return o, createInfo, nil
 }
 
