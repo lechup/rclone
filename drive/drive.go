@@ -273,6 +273,8 @@ OUTER:
 			return false, errors.Wrap(err, "couldn't list directory")
 		}
 		for _, item := range files.Items {
+			item.Title = strings.Replace(item.Title, '/', '_', -1)
+			fmt.Printf("+++++ (%s)\n", item.Title)
 			if fn(item) {
 				found = true
 				break OUTER
